@@ -35,12 +35,12 @@ func (g GameState) String() string {
 	}
 }
 
-func readRoomNames() {
+func readRoomNames() ([]string, error) {
 	// Открываем файл для чтения
 	file, err := os.Open("rooms.txt")
 	if err != nil {
 		fmt.Println("Ошибка при открытии файла:", err)
-		return
+		return []string{}, err
 	}
 	defer file.Close()
 
@@ -54,22 +54,31 @@ func readRoomNames() {
 			roomNames = append(roomNames, line)
 		}
 	}
-
 	if err := scanner.Err(); err != nil {
 		fmt.Println("Ошибка при чтении файла:", err)
-		return
+		return []string{}, err
 	}
 
-	// Выводим считанные названия
-	fmt.Println("Названия комнат:")
-	for _, name := range roomNames {
-		fmt.Println(name)
-	}
+	return roomNames, nil
 }
 
+var GameCore Game
+
 func initGame() {
-	roomNames := readRoomNames()
-	return Game{Rooms: roomNames, Players: []game.Player{}, GameState: NEW}
+	roomNames, err := readRoomNames()
+	if err != nil {
+		fmt.Errorf("Ошибка при чтении названий комнат")
+	}
+	var rooms []game.Room
+	for i := range roomNames {
+		rooms = append(rooms, game.Room{
+			Id:         i,
+			Name:       roomNames[i],
+			RoomRoutes: []string{},
+			Commands:   []string{},
+		})
+	}
+	GameCore = Game{Rooms: rooms, Players: []game.Player{}, GameState: NEW}
 }
 
 func main() {
