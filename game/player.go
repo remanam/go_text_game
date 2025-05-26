@@ -1,9 +1,11 @@
 package game
 
 type Player struct {
-	Id     int
-	Name   string
-	RoomId int
+	Id              int
+	Name            string
+	CurrentRoomId   int
+	AvaiableActions int
+	inventory       []string
 }
 
 type PlayerActions interface {
