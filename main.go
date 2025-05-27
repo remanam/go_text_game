@@ -1,12 +1,6 @@
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-
-	"github.com/remanam/go_text_game/game"
-)
+import "slices"
 
 type GameState int
 
@@ -17,9 +11,15 @@ const (
 )
 
 type Game struct {
-	Rooms     []game.Room
-	Players   []game.Player
-	GameState GameState
+	Rooms       []Room
+	CurrentRoom Room
+	Players     Player
+	Step        int
+	GameState   GameState
+}
+
+func (g *Game) setCurrentRoom(roomName string) {
+	g.CurrentRoom = roomName
 }
 
 func (g GameState) String() string {
@@ -35,50 +35,79 @@ func (g GameState) String() string {
 	}
 }
 
-func readRoomNames() ([]string, error) {
-	// Открываем файл для чтения
-	file, err := os.Open("rooms.txt")
-	if err != nil {
-		fmt.Println("Ошибка при открытии файла:", err)
-		return []string{}, err
-	}
-	defer file.Close()
+var GameExample Game
 
-	var roomNames []string
-
-	// Создаем сканер для построчного чтения
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line != "" {
-			roomNames = append(roomNames, line)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Println("Ошибка при чтении файла:", err)
-		return []string{}, err
-	}
-
-	return roomNames, nil
+// -------------------------------------- Комнаты начало
+type Room struct {
+	Id         int
+	Name       string
+	RoomRoutes []string // куда можно пойти с этой комнаты
+	Commands   []string // какие есть действия. Взять рюкзак типа
 }
 
-var GameCore Game
+func (r *Room) GetAvaiableRooms(roomName string) []string {
+	return r.RoomRoutes
+}
+
+func (r *Room) GetAvaiableCommands(roomName string) []string {
+	return r.Commands
+}
+
+//--------------------------------------- Комнаты конец
+
+// --------------------------------------- Игрок начало
+type Player struct {
+	Id              int
+	Name            string
+	CurrentRoomId   int
+	AvaiableActions int
+	inventory       []string
+}
+
+type PlayerActions interface {
+	Move(RoomId int) error
+	Action(ActionId int) error
+}
+
+func (p *Player) Move(RoomId int) error {
+	return nil
+}
+
+func (p *Player) Action(ActionId int) error {
+	return nil
+}
+
+// --------------------------------------------- Игрок Конец
+
+var UNKNOWN_COMMAND string = "неизвестная команда"
+
+func handleCommand(command string) string {
+	if slices.Contains(GameExample.CurrentRoom.Commands, command) == false {
+		return ""
+	}
+	if command == "осмотреться" {
+		return "ты находишься на кухне, на столе: чай, надо собрать рюкзак и идти в универ. можно пройти - коридор"
+	} else if command == "идти коридор" {
+		return ""
+	} else {
+		return UNKNOWN_COMMAND
+
+	}
+}
 
 func initGame() {
-	roomNames, err := readRoomNames()
-	if err != nil {
-		fmt.Errorf("Ошибка при чтении названий комнат")
-	}
-	var rooms []game.Room
+	roomNames := []string{"кухня", "универ", "коридор", "улица", "комната", "дом"}
+
+	var rooms []Room
 	for i := range roomNames {
-		rooms = append(rooms, game.Room{
+		rooms = append(rooms, Room{
 			Id:         i,
 			Name:       roomNames[i],
 			RoomRoutes: []string{},
 			Commands:   []string{},
 		})
 	}
-	GameCore = Game{Rooms: rooms, Players: []game.Player{}, GameState: NEW}
+	GameExample = Game{Rooms: rooms, Players: Player{}, GameState: NEW}
 }
 
 func main() {
