@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -63,8 +64,10 @@ func TestGame0(t *testing.T) {
 					"\n\tcmd:", item.command,
 					"\n\tresult:  ", answer,
 					"\n\texpected:", item.answer)
+			} else {
+				fmt.Println("Команда: <" + item.command + "> обработана корректно")
 			}
+
 		}
 	}
-
 }
