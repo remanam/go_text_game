@@ -30,12 +30,11 @@ func (g *Game) setCurrentRoom(roomName string) {
 	}
 }
 
+// Не пригодилось, но можно было при пустых квестах установить "Finished"
 func (g GameState) String() string {
 	switch g {
 	case NEW:
 		return "NEW"
-	case STARTED:
-		return "STARTED"
 	case FINISHED:
 		return "FINISHED"
 	default:
@@ -65,6 +64,8 @@ type PlaceItem struct {
 	Avaiable bool
 }
 
+//--------------------------------------- Комнаты конец
+
 func (g *Game) GetLocationByName(Name string) (Location, error) {
 
 	for i := 0; i < len(g.Locations); i++ {
@@ -85,8 +86,6 @@ func (g *Game) AreQuestsDone() bool {
 	}
 	return true
 }
-
-//--------------------------------------- Комнаты конец
 
 // игровые предметы
 type Item map[string]int
@@ -178,7 +177,7 @@ func lookCommand() string {
 		places += strings.Join(items, ", ")
 		//К последнему place запятую НЕ ставим
 		if i < len(currLocation.Places)-1 &&
-			currLocation.Places[len(currLocation.Places)-1].IsEmpty == false {
+			!currLocation.Places[len(currLocation.Places)-1].IsEmpty {
 			places += ", "
 		}
 	}
