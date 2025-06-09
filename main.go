@@ -55,8 +55,6 @@ type Location struct {
 type Place struct {
 	Name       string      // Например "На столе", "На стуле"
 	PlaceItems []PlaceItem // Например "рюкзак, ключи"
-	IsEmpty    bool        // Буду использовать этот флаг, когда PlaceItems будет пустой массив
-
 }
 
 type PlaceItem struct {
@@ -141,20 +139,12 @@ func lookCommand() string {
 		routes += currLocation.LocationRoutes[i]
 	}
 
-	// Здесь мы помечаем какие Place у нас остались БЕЗ предметов
-	// Ниже для расчет places будем использовать
-	for i := range currLocation.Places {
-		if len(currLocation.Places[i].PlaceItems) == 0 {
-			currLocation.Places[i].IsEmpty = true
-		}
-	}
-
 	isLocationEmpty := true
 	var places string
 	// if currLocation.Name == "комната" {
 
 	for i := range currLocation.Places {
-		if !currLocation.Places[i].IsEmpty {
+		if len(currLocation.Places[i].PlaceItems) > 0 {
 			isLocationEmpty = false
 		}
 	}
@@ -164,7 +154,7 @@ func lookCommand() string {
 			places = "пустая комната"
 			break
 		}
-		if currLocation.Places[i].IsEmpty {
+		if len(currLocation.Places[i].PlaceItems) == 0 {
 			// Если в этом Place нет предметов, то НЕ выводим
 			continue
 		}
@@ -177,7 +167,7 @@ func lookCommand() string {
 		places += strings.Join(items, ", ")
 		//К последнему place запятую НЕ ставим
 		if i < len(currLocation.Places)-1 &&
-			!currLocation.Places[len(currLocation.Places)-1].IsEmpty {
+			len(currLocation.Places[len(currLocation.Places)-1].PlaceItems) > 0 {
 			places += ", "
 		}
 	}
