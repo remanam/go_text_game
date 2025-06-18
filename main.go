@@ -367,3 +367,10 @@ func initGame() {
 	GameExample = Game{Locations: Locations, Player: player, GameState: NEW, Quests: quests}
 	GameExample.Player.CurrentLocation = kitchen
 }
+
+func main() {
+	digits := []int{1, 2, 3, 4, 5}
+	for _, d := range digits {
+		defer fmt.Println(d)
+	}
+}
